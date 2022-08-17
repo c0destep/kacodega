@@ -1,0 +1,53 @@
+{
+  "name": "c0destep/kacodega",
+  "type": "library",
+  "description": "The Easycode PHP framework",
+  "keywords": [
+    "framework",
+    "php"
+  ],
+  "homepage": "https://codingstep.com.br",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Lucas Alves",
+      "email": "codestep@codingstep.com.br"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "twig/twig": "^3",
+    "vlucas/phpdotenv": "^5",
+    "illuminate/database": "^9",
+    "illuminate/pagination": "^9",
+    "illuminate/events": "^9"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9",
+    "phpstan/phpstan": "^1",
+    "nunomaduro/phpinsights": "^2"
+  },
+  "autoload": {
+    "files": [
+      "src/Easycode/Application/helpers.php"
+    ],
+    "psr-4": {
+      "Easycode\\": "src/Easycode/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.x-dev"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": false
+    }
+  },
+  "scripts": {
+    "phpinsights": "./vendor/bin/phpinsights"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
