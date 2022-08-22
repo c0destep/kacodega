@@ -275,7 +275,7 @@ class Route
      */
     public function getRoute(Method $method, string $uri): array
     {
-        return $this->basicRoutes[$method->value][$uri] ?? [];
+        return self::$basicRoutes[$method->value][$uri] ?? [];
     }
 
     /**
