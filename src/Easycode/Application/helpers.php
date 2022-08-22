@@ -7,6 +7,7 @@ use Easycode\Http\Response;
 
 if (!function_exists('getClientIpServer')) {
     /**
+     * Helper IP
      * @return string
      */
     function getClientIpServer(): string
@@ -33,6 +34,7 @@ if (!function_exists('getClientIpServer')) {
 
 if (!function_exists('detectBrowser')) {
     /**
+     * Helper Detect your browser
      * @param string|null $userAgent
      * @param string|null $ip
      * @return array
@@ -118,6 +120,7 @@ if (!function_exists('detectBrowser')) {
 
 if (!function_exists('route')) {
     /**
+     * Helper Route
      * @param string $uri
      * @return string
      */
@@ -129,6 +132,7 @@ if (!function_exists('route')) {
 
 if (!function_exists('assets')) {
     /**
+     * Helper Assets Files
      * @param string $pathFile
      * @return string
      */
@@ -140,6 +144,7 @@ if (!function_exists('assets')) {
 
 if (!function_exists('response')) {
     /**
+     * Helper Response Class
      * @return Response
      */
     function response(): Response
@@ -161,6 +166,7 @@ if (!function_exists('app')) {
 
 if (!function_exists('__')) {
     /**
+     * Helper Translation
      * @param string $keyName
      * @param array $values
      * @return string
