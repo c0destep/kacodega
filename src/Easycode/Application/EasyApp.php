@@ -25,7 +25,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.0-alpha';
+    public const VERSION = '1.0.0-alpha1';
     /**
      * @var EasyApp
      */
@@ -88,13 +88,17 @@ class EasyApp
     protected array $parameters = [];
 
     /**
-     * @param string $path
+     * @param string|null $path
      */
-    private function __construct(string $path = __DIR__)
+    private function __construct(string $path = null)
     {
         self::$instance = $this;
 
-        $this->rootPath = dirname($path);
+        if (is_null($path)) {
+            $path = __DIR__;
+        }
+
+        $this->rootPath = dirname(str_replace('\\', '/', trim($path)));
         $this->basePath = $this->rootPath . '/app';
         $this->cachePath = $this->rootPath . '/cache';
         $this->viewPath = $this->rootPath . '/views';
@@ -132,19 +136,21 @@ class EasyApp
                 exit(503);
         }
 
-        $pathDirectoryServer = substr($_SERVER['DOCUMENT_ROOT'], strrpos($_SERVER['DOCUMENT_ROOT'], $_SERVER['PHP_SELF']));
+        $this->loadRoutes();
+
+        $pathDirectoryServer = getenv('DOCUMENT_ROOT');
         $pathDirectorySystem = substr($this->rootPath . '/public/', strlen($pathDirectoryServer));
         $directoryApp = substr($pathDirectorySystem, 0, strlen($pathDirectorySystem));
         $protocol = isset($_SERVER['HTTPS']) && filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN) ? 'https://' : 'http://';
 
-        $this->baseRoute = $protocol . $_SERVER['SERVER_NAME'] . $directoryApp;
+        $this->baseRoute = $protocol . getenv('SERVER_NAME') . $directoryApp;
 
         if (self::environment('DB_ACTIVE')) {
             $eloquent = new Eloquent();
             $eloquent->createConnection();
         }
 
-        $this->requestUri = str_replace([$_SERVER['QUERY_STRING'], '?', $directoryApp], '', getenv('REQUEST_URI'));
+        $this->requestUri = str_replace([getenv('QUERY_STRING'), '?', $directoryApp], '', getenv('REQUEST_URI'));
         $this->requestMethod = getenv('REQUEST_METHOD');
         $this->patchUri = explode(DIRECTORY_SEPARATOR, $this->requestUri);
 
@@ -193,11 +199,18 @@ class EasyApp
         return null;
     }
 
+    private function loadRoutes(): void
+    {
+        if (file_exists($this->rootPath . '/routes/web.php')) {
+            include $this->rootPath . '/routes/web.php';
+        }
+    }
+
     /**
-     * @param string $path
+     * @param string|null $path
      * @return EasyApp
      */
-    public static function getInstance(string $path): EasyApp
+    public static function getInstance(string $path = null): EasyApp
     {
         if (!isset(self::$instance)) {
             self::$instance = new self($path);
