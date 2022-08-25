@@ -25,7 +25,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.0-alpha1';
+    public const VERSION = '1.0.0-alpha2';
     /**
      * @var EasyApp
      */
