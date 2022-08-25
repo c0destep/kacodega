@@ -105,63 +105,83 @@ class FormValidator
             $value = !array_key_exists($name, $this->data) ? null : $this->data[$name];
 
             $order = [
-                'label' => $rules['label'] ?: 'Unknown',
-                'required' => $rules['required'] ?: false
+                'label' => $rules['label'] ?? 'Unknown',
+                'required' => $rules['required'] ?? false
             ];
 
             $rulesOrdered = array_merge($order, $rules);
 
-            if ($rulesOrdered['required'] === true && is_null($value)) {
-                $this->errors[$name] = 'Please fill out the ' . $this->rules[$name]['label'] . ' field.';
+            if ($rulesOrdered['required'] === true && $this->empty($value)) {
+                $this->errors[$name] = 'Please fill out the ' . $rulesOrdered['label'] . ' field.';
                 $rulesOrdered = [];
-            } elseif ($rulesOrdered['required'] === false && is_null($value)) {
+            } elseif ($rulesOrdered['required'] === false && $this->empty($value)) {
                 $rulesOrdered = [];
             }
 
-            if (!$this->empty($rulesOrdered)) {
+            if (sizeof($rulesOrdered) > 2) {
                 foreach ($rulesOrdered as $rule => $condition) {
                     if (!in_array($rule, self::DEFAULT_RULES)) {
                         $this->errors[$name] = 'The rule ' . $rule . ' not found.';
                     } else {
                         if ($rule === 'bool') {
                             if ($condition === true && !in_array($value, self::BOOLEAN_VALUES, true)) {
-                                $this->errors[$name] = 'Please fill out the ' . $this->rules[$name]['label'] . ' field.';
+                                $this->errors[$name] = 'Please fill out the ' . $rulesOrdered['label'] . ' field.';
                             }
                         } elseif ($rule === 'alphabetical') {
                             if ($condition === true && !$this->alphabetical($value)) {
-                                $this->errors[$name] = 'Please use only alphabetical characters for the ' . $this->rules[$name]['label'] . ' field.';
+                                $this->errors[$name] = 'Please use only alphabetical characters for the ' . $rulesOrdered['label'] . ' field.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value);
                         } elseif ($rule === 'email') {
                             if ($condition === true && !$this->email($value)) {
                                 $this->errors[$name] = 'Please enter a valid email address.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value, 'email');
                         } elseif (($rule === 'number') || ($rule === 'int') || ($rule === 'integer')) {
-                            if ($condition === true && !is_numeric($value)) {
-                                $this->errors[$name] = 'Please enter a number for the ' . $this->rules[$name]['label'] . ' field.';
+                            if ($condition === true && !is_numeric($value) && !is_int($value)) {
+                                $this->errors[$name] = 'Please enter a number for the ' . $rulesOrdered['label'] . ' field.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+                        } elseif (($rule === 'double') || ($rule === 'float') || ($rule === 'real')) {
+                            if ($condition === true && !is_numeric($value) && !is_float($value)) {
+                                $this->errors[$name] = 'Please enter a number for the ' . $rulesOrdered['label'] . ' field.';
+                            }
+
+                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
                         } elseif ($rule === 'phone') {
                             if (is_string($condition) && !$this->phone($value, $condition)) {
                                 $this->errors[$name] = 'Please enter a valid phone number.';
                             } elseif (!is_string($condition) && !$this->phone($value, $condition)) {
                                 $this->errors[$name] = 'This rule only works on string data.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value);
                         } elseif ($rule === 'ipv4') {
                             if ($condition === true && !$this->ipv4($value)) {
-                                $this->errors[$name] = 'Please enter a number for the ' . $this->rules[$name]['label'] . ' field.';
+                                $this->errors[$name] = 'Please enter a number for the ' . $rulesOrdered['label'] . ' field.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value);
                         } elseif ($rule === 'ipv6') {
                             if ($condition === true && !$this->ipv6($value)) {
-                                $this->errors[$name] = 'Please enter a number for the ' . $this->rules[$name]['label'] . ' field.';
+                                $this->errors[$name] = 'Please enter a number for the ' . $rulesOrdered['label'] . ' field.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value);
                         } elseif ($rule === 'url') {
                             if ($condition === true && !$this->url($value)) {
-                                $this->errors[$name] = 'Please enter a url for the ' . $this->rules[$name]['label'] . ' field.';
+                                $this->errors[$name] = 'Please enter a url for the ' . $rulesOrdered['label'] . ' field.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value, 'url');
                         } elseif ($rule === 'minlength') {
                             if (is_string($value)) {
                                 if (is_int($condition)) {
                                     if (!$this->minlength($value, $condition)) {
-                                        $this->errors[$name] = 'The ' . $this->rules[$name]['label'] . ' field must be at least ' . $condition . ' characters long.';
+                                        $this->errors[$name] = 'The ' . $rulesOrdered['label'] . ' field must be at least ' . $condition . ' characters long.';
                                     }
                                 } else {
                                     $this->errors[$name] = 'The rule condition must be an integer.';
@@ -169,11 +189,13 @@ class FormValidator
                             } else {
                                 $this->errors[$name] = 'This rule only works on string data.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
                         } elseif ($rule === 'maxlength') {
                             if (is_string($value)) {
                                 if (is_int($condition)) {
                                     if (!$this->maxlength($value, $condition)) {
-                                        $this->errors[$name] = 'The ' . $this->rules[$name]['label'] . ' field must be ' . $condition . ' characters long at maximum.';
+                                        $this->errors[$name] = 'The ' . $rulesOrdered['label'] . ' field must be ' . $condition . ' characters long at maximum.';
                                     }
                                 } else {
                                     $this->errors[$name] = 'The rule condition must be an integer.';
@@ -181,11 +203,13 @@ class FormValidator
                             } else {
                                 $this->errors[$name] = 'This rule only works on string data.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
                         } elseif ($rule === 'min') {
                             if (is_numeric($value)) {
                                 if (is_numeric($condition)) {
                                     if (!($value >= $condition)) {
-                                        $this->errors[$name] = 'The ' . $this->rules[$name]['label'] . ' field must be greater than ' . $condition . '.';
+                                        $this->errors[$name] = 'The ' . $rulesOrdered['label'] . ' field must be greater than ' . $condition . '.';
                                     }
                                 } else {
                                     $this->errors[$name] = 'The rule condition must be an number.';
@@ -193,11 +217,13 @@ class FormValidator
                             } else {
                                 $this->errors[$name] = 'This rule only works on numeric data.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
                         } elseif ($rule === 'max') {
                             if (is_numeric($value)) {
                                 if (is_numeric($condition)) {
                                     if (!($value <= $condition)) {
-                                        $this->errors[$name] = 'The ' . $this->rules[$name]['label'] . ' field cannot exceed ' . $condition . '.';
+                                        $this->errors[$name] = 'The ' . $rulesOrdered['label'] . ' field cannot exceed ' . $condition . '.';
                                     }
                                 } else {
                                     $this->errors[$name] = 'The rule condition must be an number.';
@@ -205,9 +231,13 @@ class FormValidator
                             } else {
                                 $this->errors[$name] = 'This rule only works on numeric data.';
                             }
+
+                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
                         }
                     }
                 }
+            } else {
+                $this->data[$name] = $this->sanitize($value);
             }
         }
 
@@ -224,22 +254,10 @@ class FormValidator
         if (is_array($value)) {
             return sizeof($value) === 0;
         } elseif (is_string($value)) {
-            $value = $this->sanitize($value);
-            return is_null($value) || ($value === '');
+            return trim($value) === '';
         } else {
             return false;
         }
-    }
-
-    private function sanitize(string $value, string $type = null): mixed
-    {
-        return match ($type) {
-            'int' => filter_var($value, FILTER_SANITIZE_NUMBER_INT),
-            'float' => filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT),
-            'email' => filter_var($value, FILTER_SANITIZE_EMAIL),
-            'url' => filter_var($value, FILTER_SANITIZE_URL),
-            default => filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS)
-        };
     }
 
     /**
@@ -249,7 +267,18 @@ class FormValidator
      **/
     private function alphabetical(string $value): bool
     {
-        return preg_match('/^[ äöüèéàáíìóòôîêÄÖÜÈÉÀÁÍÌÓÒÔÊa-z]+$/i', $this->sanitize($value));
+        return preg_match('/^[ äöüèéàáíìóòôîêÄÖÜÈÉÀÁÍÌÓÒÔÊa-z]+$/i', $value);
+    }
+
+    private function sanitize(mixed $value, string $type = null): mixed
+    {
+        return match ($type) {
+            'int' => filter_var($value, FILTER_SANITIZE_NUMBER_INT),
+            'float' => filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT),
+            'email' => filter_var($value, FILTER_SANITIZE_EMAIL),
+            'url' => filter_var($value, FILTER_SANITIZE_URL),
+            default => filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS)
+        };
     }
 
     /**
@@ -259,7 +288,7 @@ class FormValidator
      **/
     private function email(string $value): bool
     {
-        return filter_var($this->sanitize($value, 'email'), FILTER_VALIDATE_EMAIL);
+        return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
 
     /**
@@ -270,7 +299,7 @@ class FormValidator
      */
     private function phone(string $value, ?string $pattern = null): bool
     {
-        return preg_match($pattern ?? '/^[+]?[- ()\/0-9]{3,18}$/i', $this->sanitize($value));
+        return preg_match($pattern ?? '/\(\d{2,}\) \d{4,}\-\d{4}/i', $value);
     }
 
     /**
@@ -291,7 +320,7 @@ class FormValidator
      */
     private function ip(string $value, int $flag = null): bool
     {
-        return filter_var($this->sanitize($value), FILTER_VALIDATE_IP, $flag);
+        return filter_var($value, FILTER_VALIDATE_IP, $flag);
     }
 
     /**
@@ -311,7 +340,7 @@ class FormValidator
      **/
     private function url(string $value): bool
     {
-        return filter_var($this->sanitize($value, 'url'), FILTER_VALIDATE_URL);
+        return filter_var($value, FILTER_VALIDATE_URL);
     }
 
     /**
@@ -334,15 +363,5 @@ class FormValidator
     private function maxlength(string $value, int $length): bool
     {
         return strlen($value) <= $length;
-    }
-
-    /**
-     * Check if value is set
-     * @param mixed $value Value
-     * @return bool
-     **/
-    private function required(mixed $value): bool
-    {
-        return !$this->empty(trim($value));
     }
 }
