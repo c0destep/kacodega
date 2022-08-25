@@ -93,8 +93,8 @@ class Response
      */
     public function renderView(ViewHtml|ViewJson $view): void
     {
-        if ($view->getView() === View::HTML) {
-            echo Twig::getInstance('./views', './cache', true)->getTwigInstance()->render($view->getView(), $view->getParameters());
+        if ($view->getType() === View::HTML) {
+            echo Twig::getInstance(app()->getViewPath(), app()->getCachePath(), true)->getTwigInstance()->render($view->getView(), $view->getParameters());
         }
 
         echo $view->toJson();

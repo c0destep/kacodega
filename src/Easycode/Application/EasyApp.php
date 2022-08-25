@@ -65,6 +65,10 @@ class EasyApp
     /**
      * @var string
      */
+    protected string $langPath;
+    /**
+     * @var string
+     */
     protected string $baseRoute;
     /**
      * @var string
@@ -95,7 +99,7 @@ class EasyApp
         self::$instance = $this;
 
         if (is_null($path)) {
-            $path = __DIR__;
+            $path = $_SERVER['PHP_SELF'];
         }
 
         $this->rootPath = dirname(str_replace('\\', '/', trim($path)));
@@ -104,6 +108,7 @@ class EasyApp
         $this->viewPath = $this->rootPath . '/views';
         $this->routePath = $this->rootPath . '/routes';
         $this->storagePath = $this->rootPath . '/storage';
+        $this->langPath = $this->rootPath . '/lang';
 
         $dotenv = Dotenv::createImmutable($this->rootPath);
         $dotenv->load();
@@ -138,20 +143,20 @@ class EasyApp
 
         $this->loadRoutes();
 
-        $pathDirectoryServer = getenv('DOCUMENT_ROOT');
+        $pathDirectoryServer = $_SERVER['DOCUMENT_ROOT'];
         $pathDirectorySystem = substr($this->rootPath . '/public/', strlen($pathDirectoryServer));
         $directoryApp = substr($pathDirectorySystem, 0, strlen($pathDirectorySystem));
         $protocol = isset($_SERVER['HTTPS']) && filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN) ? 'https://' : 'http://';
 
-        $this->baseRoute = $protocol . getenv('SERVER_NAME') . $directoryApp;
+        $this->baseRoute = $protocol . $_SERVER['SERVER_NAME'] . $directoryApp;
 
         if (self::environment('DB_ACTIVE')) {
             $eloquent = new Eloquent();
             $eloquent->createConnection();
         }
 
-        $this->requestUri = str_replace([getenv('QUERY_STRING'), '?', $directoryApp], '', getenv('REQUEST_URI'));
-        $this->requestMethod = getenv('REQUEST_METHOD');
+        $this->requestUri = str_replace([$_SERVER['QUERY_STRING'], '?', $directoryApp], '', $_SERVER['REQUEST_URI']);
+        $this->requestMethod = $_SERVER['REQUEST_METHOD'];
         $this->patchUri = explode(DIRECTORY_SEPARATOR, $this->requestUri);
 
         if (empty($this->requestUri)) {
@@ -168,9 +173,9 @@ class EasyApp
         Route::validateRoute($this->route);
         Route::clearRoutes();
 
-        $this->callbacks($this->route, 'onCallBefore', $this->route['parameters']);
-        if ($this->run($this->route[0], $this->route[1], $this->route['parameters'])) {
-            $this->callbacks($this->route, 'onCallAfter', $this->route['parameters']);
+        $this->callbacks($this->route, 'onCallBefore', $this->route['parameters'] ?? []);
+        if ($this->run($this->route['controller'], $this->route['action'], $this->route['parameters'] ?? [])) {
+            $this->callbacks($this->route, 'onCallAfter', $this->route['parameters'] ?? []);
         }
     }
 
@@ -199,6 +204,9 @@ class EasyApp
         return null;
     }
 
+    /**
+     * @return void
+     */
     private function loadRoutes(): void
     {
         if (file_exists($this->rootPath . '/routes/web.php')) {
@@ -294,9 +302,14 @@ class EasyApp
         return false;
     }
 
+    /**
+     * @param string $keyName
+     * @param array $values
+     * @return string
+     */
     public function l(string $keyName, array $values = []): string
     {
-        return Lang::getInstance(__DIR__, $this->getClientLanguage(), self::environment('DEFAULT_LANGUAGE'), explode(',', self::environment('AVAILABLE_LANGUAGES')))->key($keyName, $values);
+        return Lang::getInstance($this->langPath, $this->getClientLanguage(), self::environment('DEFAULT_LANGUAGE'), explode(',', self::environment('AVAILABLE_LANGUAGES')))->key($keyName, $values);
     }
 
     /**
@@ -353,7 +366,23 @@ class EasyApp
      */
     public function route(string $uri): string
     {
-        return str_replace('//', '/', $this->baseRoute . rtrim($uri));
+        return str_replace('//', '/', $this->baseRoute . trim($uri));
+    }
+
+    /**
+     * @return string
+     */
+    public function getCachePath(): string
+    {
+        return $this->cachePath;
+    }
+
+    /**
+     * @return string
+     */
+    public function getViewPath(): string
+    {
+        return $this->viewPath;
     }
 
     /**
@@ -367,13 +396,6 @@ class EasyApp
      * @return void
      */
     public function __wakeup(): void
-    {
-    }
-
-    /**
-     * @return void
-     */
-    public function __destruct()
     {
     }
 }

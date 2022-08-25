@@ -42,10 +42,18 @@ class View
 
     /**
      * @param string $type
+     * @param int $statusCode
+     * @param string $statusText
+     * @param string $message
+     * @param array $parameters
      */
-    public function __construct(string $type)
+    public function __construct(string $type, int $statusCode = 200, string $statusText = '', string $message = '', array $parameters = [])
     {
         $this->type = $type;
+        $this->statusCode = $statusCode;
+        $this->statusText = $statusText;
+        $this->message = $message;
+        $this->parameters = $parameters;
     }
 
     /**

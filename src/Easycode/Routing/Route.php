@@ -199,7 +199,7 @@ class Route
             } elseif ($settings[0][1] === '') {
                 throw new InvalidArgumentException("route $uri action not found");
             } else {
-                self::addRoute($method, $uri, $settings[0][0], $settings[0][1], $settings[1] ?? [], $settings[2] ?? []);
+                self::addRoute($method, $uri, $settings[0][0], $settings[0][1], $settings['headers'] ?? [], $settings['options'] ?? []);
             }
         }
     }

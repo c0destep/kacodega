@@ -21,7 +21,7 @@ class ViewJson extends View
     {
         return json_encode([
             'status' => [
-                'type' => $this->getStatusText(),
+                'text' => $this->getStatusText(),
                 'code' => $this->getStatusCode()
             ],
             'message' => $this->getMessage(),
