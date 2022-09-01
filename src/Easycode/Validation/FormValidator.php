@@ -2,6 +2,7 @@
 
 namespace Easycode\Validation;
 
+use DateTime;
 use InvalidArgumentException;
 
 class FormValidator
@@ -10,7 +11,8 @@ class FormValidator
         'required', 'label', 'bool', 'email',
         'number', 'minlength', 'maxlength',
         'phone', 'ipv4', 'ipv6', 'url',
-        'alphabetical', 'empty', 'min', 'max'
+        'alphabetical', 'empty', 'min', 'max',
+        'double', 'float', 'real', 'date', 'regex'
     ];
     private const BOOLEAN_VALUES = [
         true, false, 'true', 'false',
@@ -128,56 +130,74 @@ class FormValidator
                                 $this->errors[$name] = 'Please fill out the ' . $rulesOrdered['label'] . ' field.';
                             }
                         } elseif ($rule === 'alphabetical') {
+                            $value = $this->sanitize($value);
+
                             if ($condition === true && !$this->alphabetical($value)) {
                                 $this->errors[$name] = 'Please use only alphabetical characters for the ' . $rulesOrdered['label'] . ' field.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value);
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'email') {
+                            $value = $this->sanitize($value, 'email');
+
                             if ($condition === true && !$this->email($value)) {
                                 $this->errors[$name] = 'Please enter a valid email address.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value, 'email');
+                            $this->data[$name] = $value;
                         } elseif (($rule === 'number') || ($rule === 'int') || ($rule === 'integer')) {
+                            $value = $this->sanitize($value, 'int');
+
                             if ($condition === true && !is_numeric($value) && !is_int($value)) {
                                 $this->errors[$name] = 'Please enter a number for the ' . $rulesOrdered['label'] . ' field.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+                            $this->data[$name] = $value;
                         } elseif (($rule === 'double') || ($rule === 'float') || ($rule === 'real')) {
+                            $value = $this->sanitize($value, 'float');
+
                             if ($condition === true && !is_numeric($value) && !is_float($value)) {
                                 $this->errors[$name] = 'Please enter a number for the ' . $rulesOrdered['label'] . ' field.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'phone') {
-                            if (is_string($condition) && !$this->phone($value, $condition)) {
+                            $value = $this->sanitize($value);
+
+                            if ($condition === true && !$this->phone($value)) {
                                 $this->errors[$name] = 'Please enter a valid phone number.';
-                            } elseif (!is_string($condition) && !$this->phone($value, $condition)) {
-                                $this->errors[$name] = 'This rule only works on string data.';
+                            } elseif (is_string($condition) && !$this->phone($value, $condition)) {
+                                $this->errors[$name] = 'Please enter a valid phone number.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value);
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'ipv4') {
+                            $value = $this->sanitize($value);
+
                             if ($condition === true && !$this->ipv4($value)) {
                                 $this->errors[$name] = 'Please enter a number for the ' . $rulesOrdered['label'] . ' field.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value);
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'ipv6') {
+                            $value = $this->sanitize($value);
+
                             if ($condition === true && !$this->ipv6($value)) {
                                 $this->errors[$name] = 'Please enter a number for the ' . $rulesOrdered['label'] . ' field.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value);
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'url') {
+                            $value = $this->sanitize($value, 'url');
+
                             if ($condition === true && !$this->url($value)) {
                                 $this->errors[$name] = 'Please enter a url for the ' . $rulesOrdered['label'] . ' field.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value, 'url');
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'minlength') {
+                            $value = $this->sanitize($value);
+
                             if (is_string($value)) {
                                 if (is_int($condition)) {
                                     if (!$this->minlength($value, $condition)) {
@@ -190,8 +210,10 @@ class FormValidator
                                 $this->errors[$name] = 'This rule only works on string data.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'maxlength') {
+                            $value = $this->sanitize($value);
+
                             if (is_string($value)) {
                                 if (is_int($condition)) {
                                     if (!$this->maxlength($value, $condition)) {
@@ -204,8 +226,10 @@ class FormValidator
                                 $this->errors[$name] = 'This rule only works on string data.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'min') {
+                            $value = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+
                             if (is_numeric($value)) {
                                 if (is_numeric($condition)) {
                                     if (!($value >= $condition)) {
@@ -218,8 +242,10 @@ class FormValidator
                                 $this->errors[$name] = 'This rule only works on numeric data.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+                            $this->data[$name] = $value;
                         } elseif ($rule === 'max') {
+                            $value = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+
                             if (is_numeric($value)) {
                                 if (is_numeric($condition)) {
                                     if (!($value <= $condition)) {
@@ -232,7 +258,23 @@ class FormValidator
                                 $this->errors[$name] = 'This rule only works on numeric data.';
                             }
 
-                            $this->data[$name] = $this->sanitize($value, is_int($value) ? 'int' : 'float');
+                            $this->data[$name] = $value;
+                        } elseif ($rule === 'date') {
+                            $value = $this->sanitize($value);
+
+                            if ($condition === true && !$this->dateTime($value)) {
+                                $this->errors[$name] = 'Please enter a date in the format yyyy-mm-dd';
+                            } elseif (is_string($condition) && !$this->dateTime($value, $condition)) {
+                                $this->errors[$name] = 'Please enter a date in the format ' . $condition;
+                            }
+
+                            $this->data[$name] = $value;
+                        } elseif ($rule === 'regex') {
+                            if (is_string($condition) && !$this->regex($value, $condition)) {
+                                $this->errors[$name] = 'Please enter a valid value.';
+                            }
+
+                            $this->data[$name] = $value;
                         }
                     }
                 }
@@ -251,13 +293,18 @@ class FormValidator
      **/
     private function empty(mixed $value): bool
     {
-        if (is_array($value)) {
-            return sizeof($value) === 0;
-        } elseif (is_string($value)) {
-            return trim($value) === '';
-        } else {
-            return false;
-        }
+        return is_null($value) || (is_array($value) && sizeof($value) === 0) || (is_string($value) && trim($value) === '');
+    }
+
+    private function sanitize(mixed $value, string $type = null): mixed
+    {
+        return match ($type) {
+            'int' => filter_var($value, FILTER_SANITIZE_NUMBER_INT),
+            'float' => filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+            'email' => filter_var($value, FILTER_SANITIZE_EMAIL),
+            'url' => filter_var($value, FILTER_SANITIZE_URL),
+            default => filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS)
+        };
     }
 
     /**
@@ -268,17 +315,6 @@ class FormValidator
     private function alphabetical(string $value): bool
     {
         return preg_match('/^[ äöüèéàáíìóòôîêÄÖÜÈÉÀÁÍÌÓÒÔÊa-z]+$/i', $value);
-    }
-
-    private function sanitize(mixed $value, string $type = null): mixed
-    {
-        return match ($type) {
-            'int' => filter_var($value, FILTER_SANITIZE_NUMBER_INT),
-            'float' => filter_var($value, FILTER_SANITIZE_NUMBER_FLOAT),
-            'email' => filter_var($value, FILTER_SANITIZE_EMAIL),
-            'url' => filter_var($value, FILTER_SANITIZE_URL),
-            default => filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS)
-        };
     }
 
     /**
@@ -299,7 +335,7 @@ class FormValidator
      */
     private function phone(string $value, ?string $pattern = null): bool
     {
-        return preg_match($pattern ?? '/\(\d{2,}\) \d{4,}\-\d{4}/i', $value);
+        return preg_match($pattern ?? '/\(\d{2,}\) 9\d{4,}\-\d{4}/i', $value);
     }
 
     /**
@@ -340,7 +376,13 @@ class FormValidator
      **/
     private function url(string $value): bool
     {
-        return filter_var($value, FILTER_VALIDATE_URL);
+        $urlScheme = parse_url($value, PHP_URL_SCHEME);
+
+        if (is_null($urlScheme) || $urlScheme === false) {
+            return false;
+        }
+
+        return in_array($urlScheme, ['http', 'https'], true);
     }
 
     /**
@@ -363,5 +405,29 @@ class FormValidator
     private function maxlength(string $value, int $length): bool
     {
         return strlen($value) <= $length;
+    }
+
+    /**
+     * Checks if it is a valid date according to the format.
+     * @param string $value Value
+     * @param string $format
+     * @return bool
+     */
+    private function dateTime(string $value, string $format = 'Y-m-d'): bool
+    {
+        date_default_timezone_set('UTC');
+        $date = DateTime::createFromFormat($format, $value);
+        return $date && ($date->format($format) === $value);
+    }
+
+    /**
+     * Checks if it is a valid value according to the regex.
+     * @param string $value Value
+     * @param string $pattern Regex
+     * @return bool
+     */
+    private function regex(string $value, string $pattern): bool
+    {
+        return preg_match($pattern, $value) === true;
     }
 }

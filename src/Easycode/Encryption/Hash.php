@@ -9,7 +9,7 @@ class Hash
     /**
      * @var int
      */
-    protected static int $cost;
+    protected static int $cost = 12;
 
     /**
      *
@@ -24,21 +24,19 @@ class Hash
      */
     public static function encryptPassword(string $password): string
     {
-        static::costCheck();
-
         if ($password === '') {
             return $password;
         }
 
         return password_hash($password, PASSWORD_BCRYPT, [
-            'cost' => static::$cost
+            'cost' => self::$cost
         ]);
     }
 
     /**
-     * @return void
+     * @return int
      */
-    public static function costCheck(): void
+    public static function costCheck(): int
     {
         $timeTarget = 0.75;
         $cost = 10;
@@ -52,7 +50,7 @@ class Hash
             $end = microtime(true);
         } while ($end - $start < $timeTarget);
 
-        static::$cost = $cost;
+        return $cost;
     }
 
     /**
@@ -62,8 +60,6 @@ class Hash
      */
     public static function verifyPassword(string $password, string $encryptedPassword): bool
     {
-        static::costCheck();
-
         if (empty($password) || empty($encryptedPassword)) {
             return false;
         }

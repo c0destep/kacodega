@@ -7,6 +7,7 @@ namespace Easycode\Application;
 use Dotenv\Dotenv;
 use Easycode\Database\Eloquent;
 use Easycode\Http\Method;
+use Easycode\Http\Request;
 use Easycode\Http\Response;
 use Easycode\Routing\Route;
 use Easycode\Translation\Lang;
@@ -25,7 +26,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.0-alpha2';
+    public const VERSION = '1.0.0-beta';
     /**
      * @var EasyApp
      */
@@ -104,6 +105,7 @@ class EasyApp
 
         $this->rootPath = dirname(str_replace('\\', '/', trim($path)));
         $this->basePath = $this->rootPath . '/app';
+        $this->modelPath = $this->basePath . '/Model';
         $this->cachePath = $this->rootPath . '/cache';
         $this->viewPath = $this->rootPath . '/views';
         $this->routePath = $this->rootPath . '/routes';
@@ -278,6 +280,8 @@ class EasyApp
                 $nParameters = [];
                 foreach ($classParameters as $parameter) {
                     $nameParameter = $parameter->getName();
+
+                    $nParameters[] = Request::getInstance();
 
                     if (isset($parameters[$nameParameter])) {
                         $nParameters[] = $parameters[$nameParameter];
