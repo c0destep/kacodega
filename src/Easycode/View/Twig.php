@@ -6,6 +6,7 @@ namespace Easycode\View;
 
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFunction;
 
 class Twig
 {
@@ -29,6 +30,24 @@ class Twig
             'debug' => $debug,
             'cache' => $cache
         ]);
+
+        $app = new TwigFunction('app', function () {
+            return app();
+        });
+        $route = new TwigFunction('route', function (string $uri) {
+            return route($uri);
+        });
+        $assets = new TwigFunction('assets', function (string $pathFile) {
+            return assets($pathFile);
+        });
+        $lang = new TwigFunction('__', function (string $keyName, array $values = []) {
+            return __($keyName, $values);
+        });
+
+        $this->twigInstance->addFunction($app);
+        $this->twigInstance->addFunction($route);
+        $this->twigInstance->addFunction($assets);
+        $this->twigInstance->addFunction($lang);
     }
 
     /**

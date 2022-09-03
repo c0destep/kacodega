@@ -1,7 +1,7 @@
 {
   "name": "c0destep/kacodega",
   "type": "library",
-  "description": "The Easycode PHP framework",
+  "description": "The Core Easycode framework",
   "keywords": [
     "framework",
     "php"

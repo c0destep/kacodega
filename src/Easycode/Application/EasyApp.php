@@ -26,7 +26,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.0-beta';
+    public const VERSION = '1.0.0-beta.1';
     /**
      * @var EasyApp
      */
@@ -105,8 +105,8 @@ class EasyApp
 
         $this->rootPath = dirname(str_replace('\\', '/', trim($path)));
         $this->basePath = $this->rootPath . '/app';
-        $this->modelPath = $this->basePath . '/Model';
-        $this->cachePath = $this->rootPath . '/cache';
+        $this->modelPath = $this->basePath . '/Models';
+        $this->cachePath = $this->rootPath . '/cache/template';
         $this->viewPath = $this->rootPath . '/views';
         $this->routePath = $this->rootPath . '/routes';
         $this->storagePath = $this->rootPath . '/storage';
