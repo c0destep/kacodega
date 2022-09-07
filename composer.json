@@ -1,7 +1,7 @@
 {
   "name": "c0destep/kacodega",
   "type": "library",
-  "description": "The Core Easycode framework",
+  "description": "The Core Easycode Framework",
   "keywords": [
     "framework",
     "php"
@@ -20,7 +20,8 @@
     "vlucas/phpdotenv": "^5",
     "illuminate/database": "^9",
     "illuminate/pagination": "^9",
-    "illuminate/events": "^9"
+    "illuminate/events": "^9",
+    "ext-http": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^9",

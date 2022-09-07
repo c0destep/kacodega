@@ -95,9 +95,9 @@ class Response
     {
         if ($view->getType() === View::HTML) {
             echo Twig::getInstance(app()->getViewPath(), app()->getCachePath(), true)->getTwigInstance()->render($view->getView() . '.html.twig', $view->getParameters());
+        } else {
+            echo $view->toJson();
         }
-
-        echo $view->toJson();
     }
 
     /**

@@ -26,7 +26,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.0-beta.1';
+    public const VERSION = '1.0.0-beta.2';
     /**
      * @var EasyApp
      */
@@ -370,7 +370,7 @@ class EasyApp
      */
     public function route(string $uri): string
     {
-        return str_replace('//', '/', $this->baseRoute . trim($uri));
+        return $this->baseRoute . str_replace('//', '/', trim($uri));
     }
 
     /**

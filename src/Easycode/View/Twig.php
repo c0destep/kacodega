@@ -34,7 +34,10 @@ class Twig
         $app = new TwigFunction('app', function () {
             return app();
         });
-        $route = new TwigFunction('route', function (string $uri) {
+        $env = new TwigFunction('env', function (array|string $env) {
+            return env($env);
+        });
+        $route = new TwigFunction('route', function (string $uri = '') {
             return route($uri);
         });
         $assets = new TwigFunction('assets', function (string $pathFile) {
@@ -45,6 +48,7 @@ class Twig
         });
 
         $this->twigInstance->addFunction($app);
+        $this->twigInstance->addFunction($env);
         $this->twigInstance->addFunction($route);
         $this->twigInstance->addFunction($assets);
         $this->twigInstance->addFunction($lang);

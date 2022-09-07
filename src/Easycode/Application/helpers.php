@@ -176,3 +176,15 @@ if (!function_exists('__')) {
         return app()->l($keyName, $values);
     }
 }
+
+if (!function_exists('env')) {
+    /**
+     * Helper Config
+     * @param array|string $env
+     * @return array|string|null
+     */
+    function env(array|string $env): array|string|null
+    {
+        return EasyApp::environment($env);
+    }
+}
