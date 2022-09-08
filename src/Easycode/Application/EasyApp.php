@@ -26,7 +26,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.1';
+    public const VERSION = '1.0.2';
     /**
      * @var EasyApp
      */
@@ -146,12 +146,12 @@ class EasyApp
         $this->loadRoutes();
 
         $pathDirectoryServer = $_SERVER['DOCUMENT_ROOT'];
-        $pathDirectorySystem = substr($this->rootPath . '/public/', strlen($pathDirectoryServer));
+        $pathDirectorySystem = substr($this->rootPath . '/public', strlen($pathDirectoryServer));
         $directoryApp = substr($pathDirectorySystem, 0, strlen($pathDirectoryServer));
         $protocol = isset($_SERVER['HTTPS']) && filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN) ? 'https://' : 'http://';
 
         if ($_SERVER['SERVER_NAME'] === 'localhost') {
-            $this->baseRoute = $protocol . $_SERVER['SERVER_NAME'] . $directoryApp;
+            $this->baseRoute = $protocol . $_SERVER['SERVER_NAME'] . $directoryApp . '/';
         } else {
             $this->baseRoute = $protocol . $_SERVER['SERVER_NAME'] . DIRECTORY_SEPARATOR;
         }
@@ -161,7 +161,7 @@ class EasyApp
             $eloquent->createConnection();
         }
 
-        $this->requestUri = str_replace([$_SERVER['QUERY_STRING'], '?', $directoryApp], '', $_SERVER['REQUEST_URI']);
+        $this->requestUri = substr(str_replace([$_SERVER['QUERY_STRING'], '?', $directoryApp], '', $_SERVER['REQUEST_URI']), 1);
         $this->requestMethod = $_SERVER['REQUEST_METHOD'];
         $this->patchUri = explode(DIRECTORY_SEPARATOR, $this->requestUri);
 
