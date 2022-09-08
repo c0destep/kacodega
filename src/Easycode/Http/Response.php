@@ -7,7 +7,6 @@ namespace Easycode\Http;
 use Easycode\Application\EasyApp;
 use Easycode\Routing\Controller;
 use Easycode\View\Twig;
-use Easycode\View\View;
 use Easycode\View\ViewHtml;
 use Easycode\View\ViewJson;
 use Twig\Error\LoaderError;
@@ -94,7 +93,7 @@ class Response
      */
     public function renderView(ViewHtml|ViewJson $view): void
     {
-        if ($view->getType() === View::HTML) {
+        if ($view instanceof ViewHtml) {
             echo Twig::getInstance(EasyApp::getInstance()->getViewPath(), EasyApp::getInstance()->getCachePath(), EasyApp::environment('APP_ENV') === 'development')->getTwigInstance()->render($view->getView(), $view->getParameters());
         } else {
             echo $view->toJson();

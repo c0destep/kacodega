@@ -26,7 +26,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.0';
+    public const VERSION = '1.0.1';
     /**
      * @var EasyApp
      */
@@ -178,9 +178,9 @@ class EasyApp
             } else {
                 die('Route not found');
             }
+        } else {
+            $this->route = Route::getInstance()->getRoute(Method::from($this->requestMethod), $this->requestUri);
         }
-
-        $this->route = Route::getInstance()->getRoute(Method::from($this->requestMethod), $this->requestUri);
 
         Route::validateRoute($this->route);
         Route::clearRoutes();
@@ -323,7 +323,7 @@ class EasyApp
      */
     public function l(string $keyName, array $values = []): string
     {
-        return Lang::getInstance($this->langPath, $this->getClientLanguage(), self::environment('DEFAULT_LANGUAGE'), explode(',', self::environment('AVAILABLE_LANGUAGES')))->key($keyName, $values);
+        return Lang::getInstance($this->langPath, $this->getClientLanguage(), self::environment('DEFAULT_LANGUAGE'), explode(',', str_replace(' ', '', self::environment('AVAILABLE_LANGUAGES'))))->key($keyName, $values);
     }
 
     /**
