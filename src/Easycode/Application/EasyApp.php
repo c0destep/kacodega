@@ -26,7 +26,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.0-beta.2';
+    public const VERSION = '1.0.0';
     /**
      * @var EasyApp
      */
@@ -147,10 +147,14 @@ class EasyApp
 
         $pathDirectoryServer = $_SERVER['DOCUMENT_ROOT'];
         $pathDirectorySystem = substr($this->rootPath . '/public/', strlen($pathDirectoryServer));
-        $directoryApp = substr($pathDirectorySystem, 0, strlen($pathDirectorySystem));
+        $directoryApp = substr($pathDirectorySystem, 0, strlen($pathDirectoryServer));
         $protocol = isset($_SERVER['HTTPS']) && filter_var($_SERVER['HTTPS'], FILTER_VALIDATE_BOOLEAN) ? 'https://' : 'http://';
 
-        $this->baseRoute = $protocol . $_SERVER['SERVER_NAME'] . $directoryApp;
+        if ($_SERVER['SERVER_NAME'] === 'localhost') {
+            $this->baseRoute = $protocol . $_SERVER['SERVER_NAME'] . $directoryApp;
+        } else {
+            $this->baseRoute = $protocol . $_SERVER['SERVER_NAME'] . DIRECTORY_SEPARATOR;
+        }
 
         if (self::environment('DB_ACTIVE')) {
             $eloquent = new Eloquent();
@@ -167,7 +171,13 @@ class EasyApp
         }
 
         if (!Route::checkRoute(Method::from($this->requestMethod), $this->requestUri)) {
-            die('Route not found');
+            if (Route::checkRoute(Method::GET, 'notfound')) {
+                $this->route = Route::getInstance()->getRoute(Method::GET, 'notfound');
+            } elseif (Route::checkRoute(Method::GET, '/')) {
+                $this->route = Route::getInstance()->getRoute(Method::GET, '/');
+            } else {
+                die('Route not found');
+            }
         }
 
         $this->route = Route::getInstance()->getRoute(Method::from($this->requestMethod), $this->requestUri);

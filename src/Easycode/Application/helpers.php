@@ -124,7 +124,7 @@ if (!function_exists('route')) {
      * @param string $uri
      * @return string
      */
-    function route(string $uri): string
+    function route(string $uri = ''): string
     {
         return app()->route($uri);
     }

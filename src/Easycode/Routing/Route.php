@@ -204,6 +204,11 @@ class Route
         }
     }
 
+    public static function fallback(array $action): void
+    {
+        self::addRoute(Method::GET, 'notfound', $action[0], $action[1]);
+    }
+
     /**
      * @param Method $method
      * @param string $uri

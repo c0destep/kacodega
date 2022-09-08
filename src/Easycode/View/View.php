@@ -77,24 +77,6 @@ class View
     /**
      * @return string
      */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     * @return static
-     */
-    public function setType(string $type): static
-    {
-        $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getMessage(): string
     {
         return $this->message;

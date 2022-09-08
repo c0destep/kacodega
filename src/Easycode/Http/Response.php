@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Easycode\Http;
 
+use Easycode\Application\EasyApp;
 use Easycode\Routing\Controller;
 use Easycode\View\Twig;
 use Easycode\View\View;
@@ -94,7 +95,7 @@ class Response
     public function renderView(ViewHtml|ViewJson $view): void
     {
         if ($view->getType() === View::HTML) {
-            echo Twig::getInstance(app()->getViewPath(), app()->getCachePath(), true)->getTwigInstance()->render($view->getView() . '.html.twig', $view->getParameters());
+            echo Twig::getInstance(EasyApp::getInstance()->getViewPath(), EasyApp::getInstance()->getCachePath(), EasyApp::environment('APP_ENV') === 'development')->getTwigInstance()->render($view->getView(), $view->getParameters());
         } else {
             echo $view->toJson();
         }
