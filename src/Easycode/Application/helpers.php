@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Easycode\Application\EasyApp;
 use Easycode\Http\Response;
+use Easycode\Session\Session;
 
 if (!function_exists('getClientIpServer')) {
     /**
@@ -186,5 +187,93 @@ if (!function_exists('env')) {
     function env(array|string $env): array|string|null
     {
         return EasyApp::environment($env);
+    }
+}
+
+if (!function_exists('setFlashError')) {
+    /**
+     * Assigning error message.
+     * @param string $message
+     */
+    function setFlashError(string $message): void
+    {
+        Session::getInstance()->setFlash('error', $message);
+    }
+}
+
+if (!function_exists('getFlashError')) {
+    /**
+     * If there is error message it shows.
+     * @return string
+     */
+    function getFlashError(): string
+    {
+        return Session::getInstance()->getFlash('error') ?? '';
+    }
+}
+
+if (!function_exists('setFlashSuccess')) {
+    /**
+     * Assigning success message.
+     * @param string $message
+     */
+    function setFlashSuccess(string $message): void
+    {
+        Session::getInstance()->setFlash('success', $message);
+    }
+}
+
+if (!function_exists('getFlashSuccess')) {
+    /**
+     * If there is success message it shows.
+     * @return string
+     */
+    function getFlashSuccess(): string
+    {
+        return Session::getInstance()->getFlash('success') ?? '';
+    }
+}
+
+if (!function_exists('setFlashWarning')) {
+    /**
+     * Assigning alert message.
+     * @param string $message
+     */
+    function setFlashWarning(string $message): void
+    {
+        Session::getInstance()->setFlash('warning', $message);
+    }
+}
+
+if (!function_exists('getFlashWarning')) {
+    /**
+     * If there is warning message it shows.
+     * @return string
+     */
+    function getFlashWarning(): string
+    {
+        return Session::getInstance()->getFlash('warning') ?? '';
+    }
+}
+
+if (!function_exists('setFlashInfo')) {
+    /**
+     * Assigning alert message.
+     * @param string $message
+     */
+    function setFlashInfo(string $message): void
+    {
+        Session::getInstance()->setFlash('info', $message);
+    }
+}
+
+if (!function_exists('getFlashInfo')) {
+    /**
+     * If there is info message it shows.
+     * @return string
+     */
+    function getFlashInfo(): string
+    {
+        return Session::getInstance()->getFlash('info') ?? '';
     }
 }

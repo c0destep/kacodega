@@ -10,6 +10,7 @@ use Easycode\Http\Method;
 use Easycode\Http\Request;
 use Easycode\Http\Response;
 use Easycode\Routing\Route;
+use Easycode\Session\Session;
 use Easycode\Translation\Lang;
 use Easycode\View\ViewHtml;
 use Easycode\View\ViewJson;
@@ -26,7 +27,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.0.2';
+    public const VERSION = '1.1.2';
     /**
      * @var EasyApp
      */
@@ -184,6 +185,8 @@ class EasyApp
 
         Route::validateRoute($this->route);
         Route::clearRoutes();
+
+        Session::getInstance();
 
         $this->callbacks($this->route, 'onCallBefore', $this->route['parameters'] ?? []);
         if ($this->run($this->route['controller'], $this->route['action'], $this->route['parameters'] ?? [])) {

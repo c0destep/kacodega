@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Easycode\View;
 
+use Easycode\Application\EasyApp;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\TwigFunction;
@@ -31,20 +32,32 @@ class Twig
             'cache' => $cache
         ]);
 
-        $app = new TwigFunction('app', function () {
+        $app = new TwigFunction('app', function (): EasyApp {
             return app();
         });
-        $env = new TwigFunction('env', function (array|string $env) {
+        $env = new TwigFunction('env', function (array|string $env): array|string|null {
             return env($env);
         });
-        $route = new TwigFunction('route', function (string $uri = '') {
+        $route = new TwigFunction('route', function (string $uri = ''): string {
             return route($uri);
         });
-        $assets = new TwigFunction('assets', function (string $pathFile) {
+        $assets = new TwigFunction('assets', function (string $pathFile): string {
             return assets($pathFile);
         });
-        $lang = new TwigFunction('__', function (string $keyName, array $values = []) {
+        $lang = new TwigFunction('__', function (string $keyName, array $values = []): string {
             return __($keyName, $values);
+        });
+        $getFlashSuccess = new TwigFunction('getFlashSuccess', function (): string {
+            return getFlashSuccess();
+        });
+        $getFlashError = new TwigFunction('getFlashError', function (): string {
+            return getFlashError();
+        });
+        $getFlashWarning = new TwigFunction('getFlashWarning', function (): string {
+            return getFlashWarning();
+        });
+        $getFlashInfo = new TwigFunction('getFlashInfo', function (): string {
+            return getFlashInfo();
         });
 
         $this->twigInstance->addFunction($app);
@@ -52,6 +65,10 @@ class Twig
         $this->twigInstance->addFunction($route);
         $this->twigInstance->addFunction($assets);
         $this->twigInstance->addFunction($lang);
+        $this->twigInstance->addFunction($getFlashSuccess);
+        $this->twigInstance->addFunction($getFlashError);
+        $this->twigInstance->addFunction($getFlashWarning);
+        $this->twigInstance->addFunction($getFlashInfo);
     }
 
     /**
