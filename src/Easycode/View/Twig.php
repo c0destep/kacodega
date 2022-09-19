@@ -35,7 +35,7 @@ class Twig
         $app = new TwigFunction('app', function (): EasyApp {
             return app();
         });
-        $env = new TwigFunction('env', function (array|string $env): array|string|null {
+        $env = new TwigFunction('env', function (array|string $env): mixed {
             return env($env);
         });
         $route = new TwigFunction('route', function (string $uri = ''): string {

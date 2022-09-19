@@ -182,9 +182,9 @@ if (!function_exists('env')) {
     /**
      * Helper Config
      * @param array|string $env
-     * @return array|string|null
+     * @return mixed
      */
-    function env(array|string $env): array|string|null
+    function env(array|string $env): mixed
     {
         return EasyApp::environment($env);
     }

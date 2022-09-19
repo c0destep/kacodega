@@ -27,7 +27,7 @@ class EasyApp
      *
      * @var string
      */
-    public const VERSION = '1.1.2';
+    public const VERSION = '1.1.3';
     /**
      * @var EasyApp
      */
@@ -196,9 +196,9 @@ class EasyApp
 
     /**
      * @param string|array $env
-     * @return string|array|null
+     * @return mixed
      */
-    public static function environment(string|array $env): string|array|null
+    public static function environment(string|array $env): mixed
     {
         if (is_array($env)) {
             $temp = [];
